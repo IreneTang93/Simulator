@@ -15,62 +15,60 @@ define(['ojs/ojcore', 'knockout', 'ojs/ojknockout'],
       var smQuery = oj.ResponsiveUtils.getFrameworkQuery(oj.ResponsiveUtils.FRAMEWORK_QUERY_KEY.SM_ONLY);
       self.smScreen = oj.ResponsiveKnockoutUtils.createMediaQueryObservable(smQuery);
 
-      // Header
-      // Application Name used in Branding Area
-      self.appName = ko.observable("App Name");
-      // User Info used in Global Navigation area
-      self.userLogin = ko.observable("john.hancock@oracle.com");
-
-      // var data = new FormData();
-      // var head = {"clientVersion":"1.0","clientType":"1"};
-      // var body = {"parking_id":"1"};
-      // data.append('head', JSON.stringify(head));
-      // data.append('body', JSON.stringify(body));
-      // console.log(data);
       var data = {
         "head":{},
         "body":{"parking_id":1}
       };
 
-      // var data = JSON.stringify(body);
-
-      // $(document).ready(function() {
-          $.ajax({
-            url : "http://39.104.81.6:8000/api/v1.0/parking/ping?parking_id=1",
-            type : "GET",
-            dataType : "jsonp",
-            // contentType : "application/json",
-            // data : JSON.stringify(data),
-            cache: "no-cache",
-            // dataType: 'jsonp',
-            // mimeType : "application/json",
-            // processData : false,
-            headers: {
-              Accept: "application/json"
-            },
-            // mimeType : "multipart/form-data",
-            success : function(result) {
-              console.log("success");
-              console.log(result.body);
-              // console.warn(result.body);
-            },
-            error:function(e){
-              console.log("responseText: " + e.responseText);
-              // $(".notice").html('Error:'+msg);
-            }
-          })
-        // });
       var status1 = "Available";
       var status2 = "Occupied";
 
-      self.statusWord = ko.observable(status2);
+      self.statusWord = ko.observable("Available");
+      self.gainParkingStatus = ko.observable(false);
 
-      $('#parkingStatus').removeClass("fontcolor-red");
-      $('#parkingStatus').addClass("fontcolor-green");
+      // $(document).ready(function() {
+          // heartbeat(3000);
 
-      // function successCall(result){
-      //   if(result.)
-      // }
+
+      function heartbeat(interval){
+        $(document).ready(function() {
+          setInterval(function(){
+            $.ajax({
+              url : "http://39.104.81.6:8000/api/v1.0/parking/ping?parking_id=1",
+              type : "GET",
+              headers: {
+                Accept: "application/json"
+              },
+              success : function(result) {
+                console.log("success");
+                if(result.body.parking_status===true){
+                  self.statusWord(status2);
+                  $('#parkingStatus').removeClass("fontcolor-green");
+                  $('#parkingStatus').addClass("fontcolor-red");
+                }else{
+                  self.statusWord(status1);
+                  $('#parkingStatus').removeClass("fontcolor-red");
+                  $('#parkingStatus').addClass("fontcolor-green");
+                }
+              },
+              error:function(e){
+                console.log("responseText: " + e.responseText);
+                if(e.status==200){
+                  var response = JSON.parse(e.responseText);
+                  if(response.body.parking_status){
+                    self.gainParkingStatus(true);
+                  }else{
+                    self.gainParkingStatus(false);
+                  }
+                }else{
+                  $(".notice").html('Error:'+e);
+                }
+              }
+            });
+          },interval);
+        });
+      } 
+
       // Footer
       function footerLink(name, id, linkTarget) {
         this.name = name;
