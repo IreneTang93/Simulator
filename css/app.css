@@ -1,0 +1,19 @@
+/*
+    Document   : override
+    Created on : <date>
+    Author     : <author>
+    Description:
+        This is where any of your application specific styles should be included
+*/
+.title{
+    vertical-align: middle;
+    text-align: center;
+    font-size: 100px;
+    padding-top: 250px;
+}
+.fontcolor-green{
+    color: #458B00;
+}
+.fontcolor-red{
+    color: #CD2626;
+}
